@@ -141,7 +141,7 @@ class bitpay extends M_Gateway {
 
   function single_sub_button($pricing, $subscription, $user_id, $norepeat=false) {
     global $M_options;
-	// This function is not used for this plugin.
+    // This function is not used for this plugin.
   }
   
   function complex_sub_button($pricing, $subscription, $user_id) {
