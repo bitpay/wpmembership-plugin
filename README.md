@@ -57,7 +57,7 @@ Some web servers have outdated root CA certificates and will cause this curl err
 
 The log file is named 'bplog.txt' and can be found in the same directory as the plugin files.  Checking this log file will give you exact responses from the BitPay network, in case of failures.
 
-Check the version of this plugin agains the official repository to ensure you are using the latest version. Your issue might have been addressed in a newer version of the plugin: https://github.com/ionux/wpmembership-plugin/zipball/master
+Check the version of this plugin agains the official repository to ensure you are using the latest version. Your issue might have been addressed in a newer version of the plugin: https://github.com/bitpay/wpmembership-plugin
 
 If all else fails, send an email describing your issue *in detail* to support@bitpay.com and attach the bplog.txt file.
 
@@ -65,4 +65,7 @@ If all else fails, send an email describing your issue *in detail* to support@bi
 Version
 -------
 Version 1.0
-- Tested against WPMU Membership 2.4.6
+  - Tested against WPMU Membership 2.4.6
+
+Version 1.1
+  - Synced with php-client library
