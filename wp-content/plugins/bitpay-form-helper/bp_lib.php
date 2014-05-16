@@ -17,7 +17,7 @@
  * 
  * Bitcoin PHP payment library using the bitpay.com service.
  *
- * Version 1.5, rich@bitpay.com
+ * Version 1.6, rich@bitpay.com
  * 
  */
 
@@ -37,22 +37,7 @@ function bpLog($contents) {
   global $bpOptions;
   
   try {
-    if(isset($bpOptions['logFile']) && $bpOptions['logFile'] != '') {
-      $file = dirname(__FILE__).$bpOptions['logFile'];
-    } else {
-      // Fallback to using a default logfile name in case the variable is
-      // missing or not set.
-      $file = dirname(__FILE__).'/bplog.txt';
-    }
-
-    file_put_contents($file, date('m-d H:i:s').": ", FILE_APPEND);
-
-    if (is_array($contents))
-      $contents = var_export($contents, true);	
-    else if (is_object($contents))
-      $contents = json_encode($contents);
-
-    file_put_contents($file, $contents."\n", FILE_APPEND);
+    error_log($contents);
 
   } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
@@ -110,11 +95,15 @@ function bpCurl($url, $apiKey, $post = false) {
           if($bpOptions['useLogging'])
             bpLog('Error: ' . curl_error($curl));
         } else {
-          $response = json_decode($responseString, true);
+          if(function_exists('json_decode'))
+            $response = json_decode($responseString, true);
+          else
+            $response = bpJSONdecode($responseString);
+
           if (!$response) {
-            $response = array('error' => 'invalid json: '.$responseString);
+            $response = array('error' => 'invalid json');
             if($bpOptions['useLogging'])
-              bpLog('Error - Invalid JSON: ' . $responseString);
+              bpLog('Error - Invalid JSON.');
           }
         }
 
@@ -183,7 +172,10 @@ function bpCreateInvoice($orderId, $price, $posData, $options = array()) {
     if ($bpOptions['verifyPos']) 
       $pos['hash'] = bpHash(serialize($posData), $options['apiKey']);
 
-    $options['posData'] = json_encode($pos);
+    if(function_exists('json_encode'))
+      $options['posData'] = json_encode($pos);
+    else
+      $options['posData'] = bpJSONencode($pos);
 
     if(strlen($options['posData']) > 100)
       return array('error' => 'posData > 100 character limit. Are you using the posData hash?');
@@ -212,16 +204,12 @@ function bpCreateInvoice($orderId, $price, $posData, $options = array()) {
         $post[$o] = $options[$o];
     }
 
-    $post = json_encode($post);
+    if(function_exists('json_encode'))
+      $post = json_encode($post);
+    else
+      $post = bpJSONencode($post);
 
     $response = bpCurl('https://bitpay.com/api/invoice/', $options['apiKey'], $post);
-
-    if($bpOptions['useLogging']) {
-      bpLog('Create Invoice: ');
-      bpLog($post);
-      bpLog('Response: ');
-      bpLog($response);
-    }
 
     return $response;
 
@@ -253,7 +241,10 @@ function bpVerifyNotification($apiKey = false) {
     if (!$post)
       return 'No post data';
 
-    $json = json_decode($post, true);
+    if(function_exists('json_decode'))
+      $json = json_decode($post, true);
+    else
+      $json = bpJSONdecode($post);
 
     if (is_string($json))
       return $json; // error
@@ -261,7 +252,10 @@ function bpVerifyNotification($apiKey = false) {
     if (!array_key_exists('posData', $json))
       return 'no posData';
 
-    $posData = json_decode($json['posData'], true);
+    if(function_exists('json_decode'))
+      $posData = json_decode($json['posData'], true);
+    else
+      $posData = bpJSONdecode($json['posData']);
 
     if($bpOptions['verifyPos'] and $posData['hash'] != bpHash(serialize($posData['posData']), $apiKey))
       return 'authentication failed (bad hash)';
@@ -297,7 +291,11 @@ function bpGetInvoice($invoiceId, $apiKey=false) {
     if (is_string($response))
       return $response; // error
 
-    $response['posData'] = json_decode($response['posData'], true);
+    if(function_exists('json_decode'))
+      $response['posData'] = json_decode($response['posData'], true);
+    else
+      $response['posData'] = bpJSONdecode($response['posData']);
+
     $response['posData'] = $response['posData']['posData'];
 
     return $response;
@@ -347,7 +345,11 @@ function bpDecodeResponse($response) {
     if (empty($response) || !(is_string($response)))
       return 'Error: decodeResponse expects a string parameter.';
 
-    return json_decode($response, true);
+    if(function_exists('json_decode'))
+      return json_decode($response, true);
+    else
+      return bpJSONdecode($response);
+
   } catch (Exception $e) {
     if($bpOptions['useLogging'])
       bpLog('Error: ' . $e->getMessage());
@@ -369,15 +371,18 @@ function bpCurrencyList() {
   global $bpOptions;
 
   $currencies = array();
-	$rate_url = 'https://bitpay.com/api/rates';
+  $rate_url = 'https://bitpay.com/api/rates';
 
   try {
-	  $clist = json_decode(file_get_contents($rate_url),true);
+    if(function_exists('json_decode'))
+      $clist = json_decode(file_get_contents($rate_url),true);
+    else
+      $clist = bpJSONdecode(file_get_contents($rate_url));
 
-	  foreach($clist as $key => $value)
-		  $currencies[$value['code']] = $value['name'];
+    foreach($clist as $key => $value)
+      $currencies[$value['code']] = $value['name'];
 
-	  return $currencies;
+    return $currencies;
   } catch (Exception $e) {
     if($bpOptions['useLogging'])
       bpLog('Error: ' . $e->getMessage());
@@ -400,20 +405,213 @@ function bpCurrencyList() {
 function bpGetRate($code = 'USD') {
   global $bpOptions;
 
-	$rate_url = 'https://bitpay.com/api/rates';
+  $rate_url = 'https://bitpay.com/api/rates';
 
   try {
-	  $clist = json_decode(file_get_contents($rate_url),true);
+    if(function_exists('json_decode'))
+      $clist = json_decode(file_get_contents($rate_url),true);
+    else
+      $clist = bpJSONdecode(file_get_contents($rate_url));
 
-	  foreach($clist as $key => $value) {
+    foreach($clist as $key => $value) {
       if($value['code'] == $code)
-		    $rate = number_format($value['rate'], 2, '.', '');
-	  }
+        $rate = number_format($value['rate'], 2, '.', '');
+    }
 
-	  return $rate;
+    return $rate;
   } catch (Exception $e) {
     if($bpOptions['useLogging'])
       bpLog('Error: ' . $e->getMessage());
     return 'Error: ' . $e->getMessage();
   }
+}
+
+/**
+ * 
+ * Fallback JSON decoding function in the event you
+ * do not have the PHP JSON extension installed and
+ * cannot install it.  This function takes an encoded
+ * string and returns an associative array.
+ * 
+ * @param string $jsondata
+ * @return array $jsonarray
+ * 
+ */
+function bpJSONdecode($jsondata) {
+  $jsondata = trim(stripcslashes(str_ireplace('"','',str_ireplace('\'','',$jsondata))));
+  $jsonarray = array();
+  $level = 0;
+
+  if($jsondata == '')
+    return false;
+
+  if($jsondata[0] == '[')
+    $jsondata = trim(substr($jsondata,1,strlen($jsondata)));
+
+  if($jsondata[0] == '{')
+    $jsondata = trim(substr($jsondata,1,strlen($jsondata)));
+
+  if(substr($jsondata,strlen($jsondata)-1,1) == ']')
+    $jsondata = trim(substr($jsondata,0,strlen($jsondata)-1));
+
+  if(substr($jsondata,strlen($jsondata)-1,1) == '}')
+    $jsondata = trim(substr($jsondata,0,strlen($jsondata)-1));
+
+  $break = false;
+
+  while(!$break) {
+    if(stripos($jsondata,"\t") !== false)
+      $jsondata = str_ireplace("\t",' ',$jsondata);
+
+    if(stripos($jsondata,"\r") !== false)
+      $jsondata = str_ireplace("\r",'',$jsondata);
+
+    if(stripos($jsondata,"\n") !== false)
+      $jsondata = str_ireplace("\n",'',$jsondata);
+
+    if(stripos($jsondata,' ') !== false)
+      $jsondata = str_ireplace(' ',' ',$jsondata);
+    else
+      $break=true;
+  }
+
+  $level = 0;
+  $x = 0;
+  $array = false;
+  $object = false;
+
+  while($x<strlen($jsondata)) {
+    $var = '';
+    $val = '';
+
+    while($x < strlen($jsondata) && $jsondata[$x] == ' ')
+      $x++;
+  
+    switch($jsondata[$x]) {
+      case '[':
+        $level++;
+        break;
+      case '{':
+        $level++;
+        break;
+    }
+
+    if($level <= 0) {
+      while($x < strlen($jsondata) && $jsondata[$x] != ':') {
+        if($jsondata[$x] != ' ') $var .= $jsondata[$x];
+        $x++;
+      }
+
+      $var = trim(stripcslashes(str_ireplace('"','',$var)));
+
+      while($x < strlen($jsondata) && ($jsondata[$x] == ' ' || $jsondata[$x] == ':'))
+        $x++;
+
+      switch($jsondata[$x]) {
+        case '[':
+          $level++;
+          break;
+        case '{':
+         $level++;
+         break;
+      }
+   }
+
+    if($level > 0) {
+ 
+      while($x<strlen($jsondata) && $level > 0) {
+        $val .= $jsondata[$x];
+        $x++;
+
+        switch($jsondata[$x]) {
+          case '[':
+            $level++;
+            break;
+          case '{':
+            $level++;
+            break;
+          case ']':
+            $level--;
+            break;
+          case '}':
+            $level--;
+            break;
+        }
+      }
+
+      if($jsondata[$x] == ']' || $jsondata[$x] == '}')
+        $val .= $jsondata[$x];
+
+      $val = trim(stripcslashes(str_ireplace('"','',$val)));
+
+      while($x < strlen($jsondata) && ($jsondata[$x] == ' ' || $jsondata[$x] == ',' || $jsondata[$x] == ']' || $jsondata[$x] == '}'))
+        $x++;
+  
+    } else {
+
+      while($x<strlen($jsondata) && $jsondata[$x] != ',') {
+        $val .= $jsondata[$x];
+        $x++;
+      }
+
+      $val = trim(stripcslashes(str_ireplace('"','',$val)));
+
+      while($x < strlen($jsondata) && ($jsondata[$x] == ' ' || $jsondata[$x] == ','))
+        $x++;
+    }
+
+    $jsonarray[$var] = $val;
+
+    if($level < 0) $level = 0;
+  }
+
+  return $jsonarray;
+
+}
+
+/**
+ * 
+ * Fallback JSON encoding function in the event you
+ * do not have the PHP JSON extension installed and
+ * cannot install it.  This function takes data in
+ * various forms and returns a JSON encoded string.
+ * 
+ * @param mixed $data
+ * @return string $jsondata
+ * 
+ */
+function bpJSONencode($data) {
+  if(is_array($data)) {
+    $jsondata = '{';
+
+    foreach($data as $key => $value) {
+      $jsondata .= '"' . $key . '": ';
+
+      if(is_array($value))
+        $jsondata .= bpJSONencode($value) . ', ';
+
+      if(is_numeric($value))
+        $jsondata .= $value . ', ';
+
+      if(is_string($value))
+        $jsondata .= '"' . $value . '", ';
+
+      if(is_bool($value)) {
+        if($value)
+          $jsondata .= 'true, ';
+        else
+          $jsondata .= 'false, ';
+      }
+
+      if(is_null($value))
+        $jsondata .= 'null, ';
+    }
+
+    $jsondata = substr($jsondata,0,strlen($jsondata)-2);
+    $jsondata .= '}';
+  } else {
+    $jsondata = '{"' . $data . '"}';
+  }
+
+  return $jsondata;
 }
