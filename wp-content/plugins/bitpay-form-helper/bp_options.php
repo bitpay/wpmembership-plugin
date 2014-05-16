@@ -16,7 +16,7 @@
  * THE SOFTWARE.
  * 
  * Bitcoin PHP payment library using the bitpay.com service.
- * Version 1.5
+ * Version 1.6
  * 
  */
 
@@ -32,7 +32,7 @@ $bpOptions['apiKey'] = '';
 // whether to verify POS data by hashing above api key.  If set to false, you should
 // have some way of verifying that callback data comes from bitpay.com
 // note: this option can only be changed here.  It cannot be set dynamically. 
-$bpOptions['verifyPos'] = false;
+$bpOptions['verifyPos'] = true;
 
 // email where invoice update notifications should be sent
 $bpOptions['notificationEmail'] = '';
@@ -63,11 +63,7 @@ $bpOptions['fullNotifications'] = true;
 // transaction speed: low/medium/high.   See API docs for more details.
 $bpOptions['transactionSpeed'] = 'low'; 
 
-// Logfile for use by the bpLog function.  Note: ensure the web server process has write access
-// to this file and/or directory!
-$bpOptions['logFile'] = '/bplog.txt';
-
-// Change to 'true' if you would like automatic logging of invoices and errors.
+// Change to 'true' if you would like automatic logging of errors.
 // Otherwise you will have to call the bpLog function manually to log any information.
 $bpOptions['useLogging'] = false;
 
