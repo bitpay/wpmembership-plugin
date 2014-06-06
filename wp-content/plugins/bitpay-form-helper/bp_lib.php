@@ -37,7 +37,7 @@ function bpLog($contents) {
   global $bpOptions;
   
   try {
-    error_log($contents);
+    @error_log(var_export($contents, true));
 
   } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
@@ -74,7 +74,7 @@ function bpCurl($url, $apiKey, $post = false) {
                   'Content-Type: application/json',
                   'Content-Length: ' . $length,
                   'Authorization: Basic ' . $uname,
-                  'X-BitPay-Plugin-Info: phplib1.5',
+                  'X-BitPay-Plugin-Info: phplib1.6',
         );
 
         curl_setopt($curl, CURLOPT_URL, $url);
