@@ -3,7 +3,7 @@ bitpay/wpmembership-plugin
 
 # Installation
 
-After you have downloaded the latest plugin zip file from https://github.com/ionux/wpmembership-plugin/zipball/master unzip this archive and copy the folders including their contents into your Wordpress plugins directory.
+After you have downloaded the latest plugin zip/tarball file from file from https://github.com/bitpay/wpmembership-plugin/releases/latest unzip this archive and copy the folders including their contents into your Wordpress plugins directory.
 
 There are two folders inside this plugin zip file which contain the one WPMU Membership payment gateway file and three form helper files.  The structure is as follows:
 <pre>
