@@ -1,12 +1,20 @@
 <?php
 
 /**
- * ©2011,2012,2013,2014 BITPAY, INC.
+ * The MIT License (MIT)
  * 
- * Permission is hereby granted to any person obtaining a copy of this software
- * and associated documentation for use and/or modification in association with
- * the bitpay.com service.
- *
+ * Copyright (c) 2011-2014 BitPay
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -14,10 +22,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
- * Bitcoin PHP payment library using the bitpay.com service.
- * Version 1.6
- * 
  */
 
 global $bpOptions;
@@ -32,7 +36,7 @@ $bpOptions['apiKey'] = '';
 // whether to verify POS data by hashing above api key.  If set to false, you should
 // have some way of verifying that callback data comes from bitpay.com
 // note: this option can only be changed here.  It cannot be set dynamically. 
-$bpOptions['verifyPos'] = true;
+$bpOptions['verifyPos'] = false;
 
 // email where invoice update notifications should be sent
 $bpOptions['notificationEmail'] = '';
