@@ -44,7 +44,7 @@
         $post[$key] = $_POST[$key];
     }  
     
-   $invresp = bpCreateInvoice($_POST['orderId'],$_POST['price'],$_POST['posData'],$post);
+   $invresp = bpCreateInvoice($_POST['orderId'],$_POST['price'],substr($_POST['posData'],0,99),$post);
    
    if(isset($invresp['url']))
      header('Location: ' . $invresp['url']);
