@@ -34,7 +34,7 @@
    $post = array();
    $bpOptions['apiKey'] = base64_decode(trim($_POST['rcla']));
    $opts = array('orderID', 'itemDesc', 'itemCode', 'notificationEmail', 'notificationURL', 'redirectURL', 
-                 'posData', 'price', 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName', 
+                 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName', 
                  'buyerAddress1', 'buyerAddress2', 'buyerCity', 'buyerState', 'buyerZip', 'buyerEmail', 'buyerPhone');
 
     $opts = array_flip($opts);
@@ -44,7 +44,7 @@
         $post[$key] = $_POST[$key];
     }  
     
-   $invresp = bpCreateInvoice($_POST['orderId'],$_POST['price'],$_POST['posData'],$post);
+   $invresp = bpCreateInvoice($_POST['orderId'],$_POST['price'],substr($_POST['posData'],0,99),$post);
    
    if(isset($invresp['url']))
      header('Location: ' . $invresp['url']);
