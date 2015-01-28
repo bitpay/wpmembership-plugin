@@ -31,7 +31,7 @@
 
 // Membership_Gateway is the name of the Gateway class in the newer versions, so we create an alias
 // in order to reference it as the older name for version difference purposes
-if(class_exists(Membership_Gateway)) {
+if(class_exists('Membership_Gateway')) {
 	class_alias('Membership_Gateway', 'M_Gateway');
 }
 
@@ -55,7 +55,7 @@ class bitpay extends M_Gateway {
 	function __construct() {
 		// Update to work with latest 3.5.x Membership version
 		// and keep backward compatibility with older versions as well
-		if(!class_exists(Membership_Gateway)) {
+		if(!class_exists('Membership_Gateway')) {
 			return;
 		} else {
 			parent::__construct();
@@ -78,7 +78,7 @@ class bitpay extends M_Gateway {
 	function bitpay() {
 		// Update to work with latest 3.5.x Membership version
 		// and keep backward compatibility with older versions as well
-		if(class_exists(Membership_Gateway)) {
+		if(class_exists('Membership_Gateway')) {
 			return;
 		} else {
 			parent::M_Gateway();
@@ -166,7 +166,7 @@ class bitpay extends M_Gateway {
 	function single_button($pricing, $subscription, $user_id) {
 		global $M_options;
 		
-		if(class_exists(Membership_Gateway)) {
+		if(class_exists('Membership_Gateway')) {
 			// It is possible there is free trial set before the actual subscription takes place,
 			// so we're going to find the first price that's >0 and use that as our price
 			if ( $pricing[0][ 'amount' ] < 1 ) {
@@ -327,7 +327,7 @@ class bitpay extends M_Gateway {
 
 					// Update to work with latest 3.5.x Membership version
 					// and keep backward compatibility with older versions as well
-					if (!class_exists(Membership_Gateway))
+					if (!class_exists('Membership_Gateway'))
 						$isDuplicate = $this->duplicate_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
 					else
 						$isDuplicate = $this->_check_duplicate_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
@@ -335,7 +335,7 @@ class bitpay extends M_Gateway {
 					if(!$isDuplicate) {
 						// Update to work with latest 3.5.x Membership version
 						// and keep backward compatibility with older versions as well
-						if (!class_exists(Membership_Gateway))
+						if (!class_exists('Membership_Gateway'))
 							$this->record_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
 						else
 							$this->_record_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
@@ -362,7 +362,7 @@ class bitpay extends M_Gateway {
 
 					// Update to work with latest 3.5.x Membership version
 					// and keep backward compatibility with older versions as well
-					if (!class_exists(Membership_Gateway))
+					if (!class_exists('Membership_Gateway'))
 						$this->record_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
 					else
 						$this->_record_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
@@ -391,7 +391,7 @@ class bitpay extends M_Gateway {
 
 					// Update to work with latest 3.5.x Membership version
 					// and keep backward compatibility with older versions as well
-					if (!class_exists(Membership_Gateway))
+					if (!class_exists('Membership_Gateway'))
 						$this->record_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
 					else
 						$this->_record_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
@@ -416,7 +416,7 @@ class bitpay extends M_Gateway {
 
 // Update to work with latest 3.5.x Membership version
 // and keep backward compatibility with older versions as well
-if(!class_exists(Membership_Gateway)) {
+if(!class_exists('Membership_Gateway')) {
 	M_register_gateway('bitpay', 'bitpay');
 } else {
 	Membership_Gateway::register_gateway('bitpay', 'bitpay');
