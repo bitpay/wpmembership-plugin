@@ -36,7 +36,7 @@ $bpOptions['apiKey'] = '';
 // whether to verify POS data by hashing above api key.  If set to false, you should
 // have some way of verifying that callback data comes from bitpay.com
 // note: this option can only be changed here.  It cannot be set dynamically. 
-$bpOptions['verifyPos'] = true;
+$bpOptions['verifyPos'] = false;
 
 // email where invoice update notifications should be sent
 $bpOptions['notificationEmail'] = '';
