@@ -34,7 +34,7 @@
    $post = array();
    $bpOptions['apiKey'] = base64_decode(trim($_POST['rcla']));
    $opts = array('orderID', 'itemDesc', 'itemCode', 'notificationEmail', 'notificationURL', 'redirectURL', 
-                 'posData', 'price', 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName', 
+                 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName', 
                  'buyerAddress1', 'buyerAddress2', 'buyerCity', 'buyerState', 'buyerZip', 'buyerEmail', 'buyerPhone');
 
     $opts = array_flip($opts);
