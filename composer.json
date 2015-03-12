@@ -1,5 +1,5 @@
 {
-    "name": "bitpay/whmcs",
+    "name": "bitpay/wpmembership",
     "description": "BitPay payment plugin for WPMU Membership",
     "type": "wpmembership-plugin",
     "keywords": ["wpmembership","plugin","payment","ecommerce","bitcoin","bitpay","membership","wordpress"],
