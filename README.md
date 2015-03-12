@@ -2,6 +2,8 @@
 
 Bitcoin payment plugin for WPMU Membership using the bitpay.com service.
 
+[![Build Status](https://travis-ci.org/bitpay/wpmembership-plugin.svg)](https://travis-ci.org/bitpay/wpmembership-plugin)
+
 
 ## Quick Start Guide
 
