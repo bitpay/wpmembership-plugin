@@ -2,19 +2,19 @@
 
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2011-2014 BitPay
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,7 @@
 
 global $bpOptions;
 
-// Please look carefully through these options and adjust according to your installation.  
+// Please look carefully through these options and adjust according to your installation.
 // Alternatively, most of these options can be dynamically set upon calling the functions in bp_lib.
 
 // REQUIRED Api key you created at bitpay.com
@@ -35,7 +35,7 @@ $bpOptions['apiKey'] = '';
 
 // whether to verify POS data by hashing above api key.  If set to false, you should
 // have some way of verifying that callback data comes from bitpay.com
-// note: this option can only be changed here.  It cannot be set dynamically. 
+// note: this option can only be changed here.  It cannot be set dynamically.
 $bpOptions['verifyPos'] = false;
 
 // email where invoice update notifications should be sent
@@ -65,7 +65,7 @@ $bpOptions['physical'] = true;
 $bpOptions['fullNotifications'] = true;
 
 // transaction speed: low/medium/high.   See API docs for more details.
-$bpOptions['transactionSpeed'] = 'low'; 
+$bpOptions['transactionSpeed'] = 'low';
 
 // Change to 'true' if you would like automatic logging of errors.
 // Otherwise you will have to call the bpLog function manually to log any information.
