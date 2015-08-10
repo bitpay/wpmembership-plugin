@@ -3,30 +3,17 @@
 ## Prerequisites
 You must have a BitPay merchant account to use this plugin.  It's free to [sign-up for a BitPay merchant account](https://bitpay.com/start).
 
-
 ## Installation
-
 **Note:** To use this plugin, your server must have the PHP cURL module installed, Apache mod_rewrite enabled and 'AllowOverrides' set to 'All' in your Apache configuration file (if you're using Apache) for your website files directory.  If you are unsure how to check or configure these items, contact your server administrator or webhosting provider support for assistance.
 
-To install this plugin, unzip the files, and move the contents of bitpay_installation_files into your wordpress root directory. Then, go to your browser and type in the url path to your wordpress directory, adding a /bitpayinstall.php at the end. For example, if my document root is already set to start inside of the wordpress root folder, I would type `http://mydomain.com/bitpayinstall.php` into my browser url bar. Follow the directions and fix any necessary permission errors.
+###Using the bitpayinstall.php script
+To install this plugin, unzip the files, and move the contents of bitpay_installation_files (bitpayinstall.php and bitpay_files) into your wordpress root directory. Then, go to your browser and type in the url path to your wordpress directory, adding a /bitpayinstall.php at the end. For example, if my document root is already set to start inside of the wordpress root folder, I would type `http://mydomain.com/bitpayinstall.php` into my browser url bar. Follow the directions and fix any necessary permission errors. The install script will determine the architecture of your wordpress folder and automatically install the files in their respective locations.
 
-The install script will determine the architecture of your wordpress folder and automatically install the files in their respective locations. As of Membership 4.x.x, there are two architectures and the files will be installed in the following folders based on Membership version:
 
-For Membership version after 4.x.x
-```
- wp-content/
-            plugins/
-                    bitpay-form-helper/
-                                       bp_lib.php
-                                       bp_options.php
-                                       form.php
-                    membership/
-                               membershipincludes/
-                                                  gateways/
-                                                           gateway.bitpay.php
-```
+### Manual installation.
+If you do not wish to use the installer script, or if you find difficulty using the installer script, you may manually move the files inside bitpay_files into their respective locations. As of Membership 4.x.x, there are two architectures and the files will be installed in the following folders based on Membership version:
 
-For Membership versions before 4.x.x
+For Membership versions after 4.x.x
 ```
  wp-content/
             plugins/
@@ -41,9 +28,21 @@ For Membership versions before 4.x.x
                                                                    gateway.bitpay.php
 ```
 
+For Membership version before 4.x.x
+```
+ wp-content/
+            plugins/
+                    bitpay-form-helper/
+                                       bp_lib.php
+                                       bp_options.php
+                                       form.php
+                    membership/
+                               membershipincludes/
+                                                  gateways/
+                                                           gateway.bitpay.php
+```
 
 ## Configuration
-
 * Create an API key at bitpay.com by clicking My Account > API Access Keys > Add New API Key.
 * Log into your Wordpress admin area and click Membership > Gateways.
 * Enter your API key from step 1.
@@ -55,7 +54,6 @@ For Membership versions before 4.x.x
 
 
 ## Usage
-
 When a member chooses the Bitcoin payment method and places their order, they will be redirected to bitpay.com to pay.  Bitpay will send a notification to your server which this plugin handles.  Then the customer will be redirected to an order summary page.
 
 The membership subscription is instantly activated once the user pays their invoice. If you wish to change this behavior to keep the subscription in a "processing" state until a completed IPN message is received, open the gateway.bitpay.php file in your favorite editor and scroll down to the handle_bitpay_return() function.  Inside this function, there is a switch/case block which contains the code that handles the IPN status messages and performs the necessary subscription management.  The first edit you'll need to make is to remove or comment out the 'paid' case statement.  Then scroll further down and uncomment the 'paid' case block that will keep the subscription in the desired processing state.  These are the only two changes required to activate 'processing' state handling.
