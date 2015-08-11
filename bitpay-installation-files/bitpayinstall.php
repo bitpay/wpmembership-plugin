@@ -30,7 +30,6 @@
         </form>
     <?php
     }
-
     //Step 2: Checks if the required folders exist and have the proper permissions.
     function step_2() {
         //search for wordpress root folder
@@ -44,14 +43,11 @@
                 break;
             }
         }
-
-
         //check if wp-content exists
         if ($wp_content_directory == '') {
             echo "wp-content not found. Please make sure that bitpayinstall.php is in the root of your word press directory.";
             die();
         }
-
         //check plugins folder
         $plugins_temp = $wp_content_directory . '/plugins';
         if (!is_dir($plugins_temp)) {
@@ -63,7 +59,6 @@
             die();
         }
         $plugins_directory = $plugins_temp;
-
         //check gateway folder
         if (is_dir($wp_content_directory . '/plugins/membership/membershipincludes/gateways')) {
             $gateway_temp = $wp_content_directory . '/plugins/membership/membershipincludes/gateways';
@@ -78,19 +73,16 @@
             die();
         }
         $gateway_directory = $gateway_temp;
-
-        //check bitpay_files folder
-        if (!is_dir(getcwd() . "/bitpay_files")) {
-            echo "bitpay_files missing, please make sure that the bitpay_files are in the same directory as bitpayinstall.php";
+        //check bitpay-files folder
+        if (!is_dir(getcwd() . "/bitpay-files")) {
+            echo "bitpay-files missing, please make sure that the bitpay-files are in the same directory as bitpayinstall.php";
             die();
         }
-        if (!is_writeable(getcwd() . "/bitpay_files")) {
-            echo "bitpay_files are not writeable, please make sure that the folder has 0777 permissions.";
+        if (!is_writeable(getcwd() . "/bitpay-files")) {
+            echo "bitpay-files are not writeable, please make sure that the folder has 0777 permissions.";
             die();
         }
-        $bitpay_files_directory = getcwd() . "/bitpay_files";
-
-
+        $bitpay_files_directory = getcwd() . "/bitpay-files";
         if ($pre_error == '') {
             //no errors, show continue button
         ?>
@@ -107,14 +99,12 @@
             echo $pre_error;
         }
     }
-
-    //Step 3: Finally moves the files over to their respective locations based on the submission form from step 2. bitpay_files will be deleted afterwards. The user will have to delete bitpayinstall.php afterwards.
+    //Step 3: Finally moves the files over to their respective locations based on the submission form from step 2. bitpay-files will be deleted afterwards. The user will have to delete bitpayinstall.php afterwards.
     function step_3() {
         //if it exists, proceed to move files.
         $bitpay_files_directory = $_POST['bitpay_files_directory'];
         $plugins_directory = $_POST['plugins_directory'];
         $gateway_directory = $_POST['gateway_directory'];
-
         if ($bitpay_files_directory == '' && $plugins_directory == '' && $gateway_directory == '') {
         ?>
             <p>If you need to reinstall, please restart the installation. If you already installed, please delete bitpayinstall.php</p>
@@ -124,15 +114,12 @@
         <?php
             die();
         }
-
         //move gateway.bitpay.php
         rename($bitpay_files_directory . "/gateway.bitpay.php", $gateway_directory . "/gateway.bitpay.php");
-
         //move bp_lib.php, bp_options.php, form.php
         $helper_destination = $plugins_directory . "/bitpay-form-helper";
         mkdir($helper_destination);
         $files = scandir($bitpay_files_directory);
-
         foreach ($files as $file) {
             if ($file != "gateway.bitpay.php" && $file != "." && $file != "..") {
                 copy($bitpay_files_directory . "/" . $file, $helper_destination . "/" . $file);
@@ -142,14 +129,12 @@
         foreach($delete as $file) {
             unlink($file);
         }
-
         //check if the bitpay_files is empty and remove it
         if (count(glob($bitpay_files_directory . "/*")) === 0 && $bitpay_files_directory != '') {
             rmdir($bitpay_files_directory);
         } else {
-            $pre_error = "Something went wrong with moving files; the bitpay_files folder is not empty.";
+            $pre_error = "Something went wrong with moving files; the bitpay-files folder is not empty.";
         }
-
         if ($pre_error == '') {
             //no errors, show continue button
         ?>
