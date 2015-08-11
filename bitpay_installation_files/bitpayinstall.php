@@ -134,7 +134,7 @@
         $files = scandir($bitpay_files_directory);
 
         foreach ($files as $file) {
-            if ($file != "gateway.bitpay.php") {
+            if ($file != "gateway.bitpay.php" && $file != "." && $file != "..") {
                 copy($bitpay_files_directory . "/" . $file, $helper_destination . "/" . $file);
                 $delete[] = $bitpay_files_directory . "/" . $file;
             }
