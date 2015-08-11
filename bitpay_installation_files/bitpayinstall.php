@@ -144,7 +144,7 @@
         }
 
         //check if the bitpay_files is empty and remove it
-        if (count(glob($bitpay_files_directory . "/*") && $bitpay_files_directory != '') === 0) {
+        if (count(glob($bitpay_files_directory . "/*")) === 0 && $bitpay_files_directory != '') {
             rmdir($bitpay_files_directory);
         } else {
             $pre_error = "Something went wrong with moving files; the bitpay_files folder is not empty.";
@@ -153,7 +153,7 @@
         if ($pre_error == '') {
             //no errors, show continue button
         ?>
-            <p>Installation was successful! Please manually delete bitpayinstall.php before continuing.</p>
+            <p>Installation was successful! Please manually delete bitpayinstall.php and any other bitpay installation files before continuing.</p>
             <form action="wp-admin" method="post">
                 <input type="submit" value="Continue" />
             </form>
