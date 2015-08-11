@@ -197,7 +197,7 @@ function bpCreateInvoice($orderId, $price, $posData, $options = array(), $networ
     */
     // Usage information for support purposes. Do not modify.
     //$postOptions['pluginName']    = 'PHP Library';
-    //$postOptions['pluginVersion'] = '1.3';
+    //$postOptions['pluginVersion'] = '1.4';
     //$postOptions['serverInfo']    = htmlentities($_SERVER['SERVER_SIGNATURE'], ENT_QUOTES);
     //$postOptions['serverVersion'] = htmlentities($_SERVER['SERVER_SOFTWARE'], ENT_QUOTES);
     //$postOptions['addPluginInfo'] = htmlentities($_SERVER['SCRIPT_FILENAME'], ENT_QUOTES);
