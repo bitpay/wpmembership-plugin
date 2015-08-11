@@ -10,9 +10,10 @@ To extract the tar.gz file, use the following command:
 ```
 tar -zxpvf wpmembership-plugin-1.4.0.zip
 ```
+Move the contents of bitpay_installation_files (bitpayinstall.php and bitpay_files) into your wordpress root directory.
 
 ### Using the bitpayinstall.php script
-To install this plugin, untar the files using the -zxpvf tag, and move the contents of bitpay_installation_files (bitpayinstall.php and bitpay_files) into your wordpress root directory. Then, go to your browser and type in the url path to your wordpress directory, adding a /bitpayinstall.php at the end. For example, if my document root is already set to start inside of the wordpress root folder, I would type `http://mydomain.com/bitpayinstall.php` into my browser url bar. Follow the directions and fix any necessary permission errors. The install script will determine the architecture of your wordpress folder and automatically install the files in their respective locations.
+After moving the files, go to your browser and type in the url path to your wordpress directory, adding a /bitpayinstall.php at the end. For example, if my document root is already set to start inside of the wordpress root folder, I would type `http://mydomain.com/bitpayinstall.php` into my browser url bar. Follow the directions and fix any necessary permission errors. The install script will determine the architecture of your wordpress folder and automatically install the files in their respective locations.
 
 **NOTE** The install script will not work without 777 permissions on bitpay_files. If you extracted using the -zxpvf (-p tag specifically) by default the permissions should be 777. On the case that it isn't, the install-script will prompt you to set permissions before continuing.
 
