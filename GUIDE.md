@@ -8,7 +8,7 @@ You must have a BitPay merchant account to use this plugin.  It's free to [sign-
 
 To extract the tar.gz file, use the following command:
 ```
-tar -zxpvf wpmembership-plugin-1.4.0.zip
+tar -zxpvf wpmembership-plugin-1.4.0.tar.gz
 ```
 Move the contents of bitpay-installation-files (bitpayinstall.php and bitpay-files) into your wordpress root directory.
 
