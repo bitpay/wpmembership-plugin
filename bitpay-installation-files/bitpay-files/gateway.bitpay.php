@@ -2,19 +2,19 @@
 
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2011-2014 BitPay
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -56,7 +56,7 @@ class bitpay extends M_Gateway {
 		// Update to work with latest 3.5.x Membership version
 		// and keep backward compatibility with older versions as well
 		if(!class_exists('Membership_Gateway')) {
-			return;
+			$this->bitpay();
 		} else {
 			parent::__construct();
 
@@ -122,6 +122,13 @@ class bitpay extends M_Gateway {
 		  </td>
 		  </tr>
 		  <tr valign="top">
+		  <th scope="row"><?php _e('Network', 'membership') ?></th>
+		  <td><select name="network">
+		  <option value="live" <?php if (get_option( $this->gateway . "_network" ) == 'live') echo 'selected="selected"'; ?>><?php _e('Live Bitcoin ~ www.bitpay.com', 'membership') ?></option>
+		  <option value="test" <?php if (get_option( $this->gateway . "_network" ) == 'test') echo 'selected="selected"'; ?>><?php _e('Test Bitcoin ~ test.bitpay.com', 'membership') ?></option>
+		  </select><br /></td>
+		  </tr>
+		  <tr valign="top">
 		  <th scope="row"><?php _e('Form Helper POST URL', 'membership') ?></th>
 		  <?php
 		  	// The default string here can be overriden in the gateway settings when you save a new value.
@@ -150,7 +157,7 @@ class bitpay extends M_Gateway {
 	function build_custom($user_id, $sub_id, $amount) {
 		$custom = '';
 
-		// The format is: 
+		// The format is:
 		// timestamp : user_id : sub_id : md5('MEMBERSHIP' + the amount)
 		$custom = time() . ':' . $user_id . ':' . $sub_id . ':';
 		$key = md5('MEMBERSHIP' . $amount);
@@ -165,7 +172,7 @@ class bitpay extends M_Gateway {
 	// calls the BitPay form helper in the wp-plugins directory.
 	function single_button($pricing, $subscription, $user_id) {
 		global $M_options;
-		
+
 		if(class_exists('Membership_Gateway')) {
 			// It is possible there is free trial set before the actual subscription takes place,
 			// so we're going to find the first price that's >0 and use that as our price
@@ -185,9 +192,9 @@ class bitpay extends M_Gateway {
 			$M_options['paymentcurrency'] = 'USD';
 
 		$form = '';
-	
+
 		$bpformURL = get_option($this->gateway . "_bitpay_formurl", "https://your_website_url/wp-content/plugins/bitpay-form-helper/form.php");
-	
+
 		$form .= '<form id="bitpay-form"  action="'. $bpformURL .'" method="post">';
 		$form .= '<input type="hidden" name="orderID" value="' . $subscription->id . '">';
 		$form .= '<input type="hidden" name="itemCode" value="' . $subscription->sub_id() . '">';
@@ -199,7 +206,9 @@ class bitpay extends M_Gateway {
 		$form .= '<input type="hidden" name="posData" value="' . $this->build_custom($user_id, $subscription->id, number_format($pricing[0]['amount'], 2)) .'">';
 		$form .= '<input type="hidden" name="notificationURL" value="' . trailingslashit(get_option('home')) . 'paymentreturn/' . esc_attr($this->gateway) . '">';
 		$form .= '<input type="hidden" name="redirectURL" value="' . apply_filters( 'membership_return_url_' . $this->gateway, M_get_returnurl_permalink()) . '">';
-	
+		$form .= '<input type="hidden" name="network" value="' . get_option( $this->gateway . "_network" ) . '">';
+
+
 		$button = get_option( $this->gateway . "_bitpay_button", 'https://button_URL_goes_here' );
 
 		$form .= '<input type="image" name="submit" border="0" src="' . $button . '" alt="Bitcoin payments via BitPay">';
@@ -264,6 +273,7 @@ class bitpay extends M_Gateway {
 			update_option( $this->gateway . "_transact_speed", $_POST[ 'transact_speed' ] );
 			update_option( $this->gateway . "_bitpay_button", $_POST[ 'bitpay_button' ] );
 			update_option( $this->gateway . "_bitpay_formurl", $_POST[ 'bitpay_formurl' ] );
+			update_option( $this->gateway . "_network", $_POST[ 'network' ] );
 		}
 
 		// default action is to return true
@@ -271,7 +281,7 @@ class bitpay extends M_Gateway {
 
 	}
 
-	function bpHash($data, $key) {	
+	function bpHash($data, $key) {
 		try {
 			$hmac = base64_encode(hash_hmac('sha256', $data, $key, TRUE));
 			return strtr($hmac, array('+' => '-', '/' => '_', '=' => ''));
@@ -287,20 +297,20 @@ class bitpay extends M_Gateway {
 
 			if (!$post)
 				return 'No post data';
-	
+
 			$response = json_decode($post, true);
-	
+
 			if (is_string($response))
 				return $response; // error
-	
+
 			if (!array_key_exists('posData', $response))
 				return 'No posData';
 
 			$posData = json_decode($response['posData'], true);
-	
+
 			if($bpOptions['verifyPos'] and $posData['hash'] != bpHash(serialize($posData['posData']), $bpOptions['apiKey']))
 				return 'Authentication failed (bad hash)';
-	
+
 			$response['posData'] = $posData['posData'];
 
 		} catch (Exception $e) {
@@ -308,7 +318,7 @@ class bitpay extends M_Gateway {
 				bpLog('Error: ' . $e->getMessage());
 			return array('error' => $e->getMessage());
 		}
-	
+
 		if (isset($response['status'])) {
 			switch ($response['status']) {
 				case 'new':
@@ -319,20 +329,20 @@ class bitpay extends M_Gateway {
 				case 'complete':
 				case 'confirmed':
 					// payment has been paid, confirmed or marked complete
-					$note = 'Payment confirmed! BitPay Invoice ID: ' . $response['id'];
+					$note = 'Payment '. $response['status'] .'! BitPay Invoice ID: ' . $response['id'];
 					$amount = $response['price'];
 					$currency = $response['currency'];
 
 					list($timestamp, $user_id, $sub_id, $key) = explode(':', $response['posData']);
 
-					// Update to work with latest 3.5.x Membership version
-					// and keep backward compatibility with older versions as well
-					if (!class_exists('Membership_Gateway'))
-						$isDuplicate = $this->duplicate_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
-					else
-						$isDuplicate = $this->_check_duplicate_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
-							
-					if(!$isDuplicate) {
+					// // Update to work with latest 3.5.x Membership version
+					// // and keep backward compatibility with older versions as well
+					// if (!class_exists('Membership_Gateway'))
+					// 	$isDuplicate = $this->duplicate_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
+					// else
+					// 	$isDuplicate = $this->_check_duplicate_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
+
+					// if(!$isDuplicate) {
 						// Update to work with latest 3.5.x Membership version
 						// and keep backward compatibility with older versions as well
 						if (!class_exists('Membership_Gateway'))
@@ -341,15 +351,15 @@ class bitpay extends M_Gateway {
 							$this->_record_transaction($user_id, $sub_id, $amount, $currency, $timestamp, $response['id'], $response['status'], $note);
 
 						do_action('membership_payment_processed', $user_id, $sub_id, $amount, $currency, $response['id']);
-				
+
 						// create_subscription
 						$member = new M_Membership($user_id);
 
 						if($member)
 							$member->create_subscription($sub_id, $this->gateway);
-				
+
 						do_action('membership_payment_subscr_signup', $user_id, $sub_id);
-					}
+					// }
 					break;
 
 				case 'invalid':

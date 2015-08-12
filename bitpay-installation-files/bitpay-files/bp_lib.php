@@ -2,19 +2,19 @@
 
 /**
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2011-2014 BitPay
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,12 +33,12 @@ require_once 'bp_options.php';
  *
  * @param mixed $contents
  * @return
- * @throws Exception $e 
+ * @throws Exception $e
  *
  */
 function bpLog($contents) {
   global $bpOptions;
-  
+
   try {
     @error_log(var_export($contents, true));
 
@@ -57,7 +57,7 @@ function bpLog($contents) {
  *
  */
 function bpCurl($url, $apiKey, $post = false) {
-  global $bpOptions;	
+  global $bpOptions;
 
   if((isset($url) && trim($url) != '') && (isset($apiKey) && trim($apiKey) != '')) {
     try {
@@ -142,7 +142,7 @@ function bpCurl($url, $apiKey, $post = false) {
  * @throws Exception $e
  *
  */
-function bpCreateInvoice($orderId, $price, $posData, $options = array()) {
+function bpCreateInvoice($orderId, $price, $posData, $options = array(), $network = false) {
   // $orderId: Used to display an orderID to the buyer. In the account summary view, this value is used to
   // identify a ledger entry if present. Maximum length is 100 characters.
   //
@@ -166,13 +166,13 @@ function bpCreateInvoice($orderId, $price, $posData, $options = array()) {
   // If a given option is not provided here, the value of that option will default to what is found in bp_options.php
   // (see api documentation for information on these options).
 
-  global $bpOptions;	
+  global $bpOptions;
 
   try {
     $options = array_merge($bpOptions, $options);  // $options override any options found in bp_options.php
     $pos = array('posData' => $posData);
 
-    if ($bpOptions['verifyPos']) 
+    if ($bpOptions['verifyPos'])
       $pos['hash'] = bpHash(serialize($posData), $options['apiKey']);
 
     if(function_exists('json_encode'))
@@ -186,18 +186,18 @@ function bpCreateInvoice($orderId, $price, $posData, $options = array()) {
     $options['orderID'] = $orderId;
     $options['price'] = $price;
 
-    $postOptions = array('orderID', 'itemDesc', 'itemCode', 'notificationEmail', 'notificationURL', 'redirectURL', 
-                         'posData', 'price', 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName', 
+    $postOptions = array('orderID', 'itemDesc', 'itemCode', 'notificationEmail', 'notificationURL', 'redirectURL',
+                         'posData', 'price', 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName',
                          'buyerAddress1', 'buyerAddress2', 'buyerCity', 'buyerState', 'buyerZip', 'buyerEmail', 'buyerPhone');
-                         
-    /* $postOptions = array('orderID', 'itemDesc', 'itemCode', 'notificationEmail', 'notificationURL', 'redirectURL', 
-                         'posData', 'price', 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName', 
+
+    /* $postOptions = array('orderID', 'itemDesc', 'itemCode', 'notificationEmail', 'notificationURL', 'redirectURL',
+                         'posData', 'price', 'currency', 'physical', 'fullNotifications', 'transactionSpeed', 'buyerName',
                          'buyerAddress1', 'buyerAddress2', 'buyerCity', 'buyerState', 'buyerZip', 'buyerEmail', 'buyerPhone',
                          'pluginName', 'pluginVersion', 'serverInfo', 'serverVersion', 'addPluginInfo');
     */
     // Usage information for support purposes. Do not modify.
     //$postOptions['pluginName']    = 'PHP Library';
-    //$postOptions['pluginVersion'] = '1.3';
+    //$postOptions['pluginVersion'] = '1.4';
     //$postOptions['serverInfo']    = htmlentities($_SERVER['SERVER_SIGNATURE'], ENT_QUOTES);
     //$postOptions['serverVersion'] = htmlentities($_SERVER['SERVER_SOFTWARE'], ENT_QUOTES);
     //$postOptions['addPluginInfo'] = htmlentities($_SERVER['SCRIPT_FILENAME'], ENT_QUOTES);
@@ -212,7 +212,12 @@ function bpCreateInvoice($orderId, $price, $posData, $options = array()) {
     else
       $post = bpJSONencode($post);
 
-    $response = bpCurl('https://bitpay.com/api/invoice/', $options['apiKey'], $post);
+    if($network == 'test')
+      $network_uri = 'test.bitpay.com';
+    else
+      $network_uri = 'bitpay.com';
+
+    $response = bpCurl('https://' . $network_uri . '/api/invoice/', $options['apiKey'], $post);
 
     return $response;
 
@@ -232,12 +237,13 @@ function bpCreateInvoice($orderId, $price, $posData, $options = array()) {
  * @throws Exception $e
  *
  */
-function bpVerifyNotification($apiKey = false) {
+function bpVerifyNotification($apiKey = false, $network = false) {
+//function currently not being used
   global $bpOptions;
 
   try {
-    if (!$apiKey) 
-      $apiKey = $bpOptions['apiKey'];		
+    if (!$apiKey)
+      $apiKey = $bpOptions['apiKey'];
 
     $post = file_get_contents("php://input");
 
@@ -270,7 +276,7 @@ function bpVerifyNotification($apiKey = false) {
         return 'Cannot find invoice ID';
     }
 
-    return bpGetInvoice($json['id'], $apiKey);
+    return bpGetInvoice($json['id'], $apiKey, $network);
   } catch (Exception $e) {
     if($bpOptions['useLogging'])
       bpLog('Error: ' . $e->getMessage());
@@ -287,14 +293,21 @@ function bpVerifyNotification($apiKey = false) {
  * @throws Exception $e
  *
  */
-function bpGetInvoice($invoiceId, $apiKey=false) {
+function bpGetInvoice($invoiceId, $apiKey=false, $network = false) {
+//function currently not being used
   global $bpOptions;
 
   try {
     if (!$apiKey)
       $apiKey = $bpOptions['apiKey'];
 
-    $response = bpCurl('https://bitpay.com/api/invoice/'.$invoiceId, $apiKey);
+    if($network == 'test')
+      $network_uri = 'test.bitpay.com';
+    else
+      $network_uri = 'bitpay.com';
+
+    $response = bpCurl('https://' . $network_uri . '/api/invoice/'.$invoiceId, $apiKey);
+
 
     if (is_string($response))
       return $response; // error
@@ -328,7 +341,7 @@ function bpGetInvoice($invoiceId, $apiKey=false) {
  */
 function bpHash($data, $key) {
   global $bpOptions;
-  
+
   try {
     $hmac = base64_encode(hash_hmac('sha256', $data, $key, TRUE));
     return strtr($hmac, array('+' => '-', '/' => '_', '=' => ''));
@@ -340,18 +353,18 @@ function bpHash($data, $key) {
 }
 
 /**
- * 
+ *
  * Decodes JSON response and returns
  * associative array.
- * 
+ *
  * @param string $response
  * @return array $arrResponse
  * @throws Exception $e
- * 
+ *
  */
 function bpDecodeResponse($response) {
   global $bpOptions;
-  
+
   try {
     if (empty($response) || !(is_string($response)))
       return 'Error: decodeResponse expects a string parameter.';
@@ -372,11 +385,11 @@ function bpDecodeResponse($response) {
  *
  * Retrieves a list of all supported currencies
  * and returns associative array.
- * 
+ *
  * @param none
  * @return array $currencies
  * @throws Exception $e
- * 
+ *
  */
 function bpCurrencyList() {
   global $bpOptions;
@@ -402,16 +415,16 @@ function bpCurrencyList() {
 }
 
 /**
- * 
+ *
  * Retrieves the current rate based on $code.
- * The default code us USD, so calling the 
+ * The default code us USD, so calling the
  * function without a parameter will return
  * the current BTC/USD price.
- * 
+ *
  * @param string $code
  * @return string $rate
  * @throws Exception $e
- * 
+ *
  */
 function bpGetRate($code = 'USD') {
   global $bpOptions;
@@ -438,15 +451,15 @@ function bpGetRate($code = 'USD') {
 }
 
 /**
- * 
+ *
  * Fallback JSON decoding function in the event you
  * do not have the PHP JSON extension installed and
  * cannot install it.  This function takes an encoded
  * string and returns an associative array.
- * 
+ *
  * @param string $jsondata
  * @return array $jsonarray
- * 
+ *
  */
 function bpJSONdecode($jsondata) {
   $jsondata = trim(stripcslashes(str_ireplace('"','',str_ireplace('\'','',$jsondata))));
@@ -497,7 +510,7 @@ function bpJSONdecode($jsondata) {
 
     while($x < strlen($jsondata) && $jsondata[$x] == ' ')
       $x++;
-  
+
     switch($jsondata[$x]) {
       case '[':
         $level++;
@@ -529,7 +542,7 @@ function bpJSONdecode($jsondata) {
    }
 
     if($level > 0) {
- 
+
       while($x<strlen($jsondata) && $level > 0) {
         $val .= $jsondata[$x];
         $x++;
@@ -557,7 +570,7 @@ function bpJSONdecode($jsondata) {
 
       while($x < strlen($jsondata) && ($jsondata[$x] == ' ' || $jsondata[$x] == ',' || $jsondata[$x] == ']' || $jsondata[$x] == '}'))
         $x++;
-  
+
     } else {
 
       while($x<strlen($jsondata) && $jsondata[$x] != ',') {
@@ -581,15 +594,15 @@ function bpJSONdecode($jsondata) {
 }
 
 /**
- * 
+ *
  * Fallback JSON encoding function in the event you
  * do not have the PHP JSON extension installed and
  * cannot install it.  This function takes data in
  * various forms and returns a JSON encoded string.
- * 
+ *
  * @param mixed $data
  * @return string $jsondata
- * 
+ *
  */
 function bpJSONencode($data) {
   if(is_array($data)) {
