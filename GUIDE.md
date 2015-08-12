@@ -6,7 +6,7 @@ You must have a BitPay merchant account to use this plugin.  It's free to [sign-
 ## Installation
 **Note:** To use this plugin, your server must have the PHP cURL module installed, Apache mod_rewrite enabled and 'AllowOverrides' set to 'All' in your Apache configuration file (if you're using Apache) for your website files directory.  If you are unsure how to check or configure these items, contact your server administrator or webhosting provider support for assistance.
 
-To extract the tar.gz file, use the following command:
+Download our [latest release](https://github.com/bitpay/wpmembership-plugin/releases/latest) from the releases page. To extract the tar.gz file, use the following command:
 ```
 tar -zxpvf wpmembership-plugin-1.4.0.tar.gz
 ```
