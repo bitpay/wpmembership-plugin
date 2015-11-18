@@ -20,6 +20,7 @@ To get up and running with our plugin quickly, see the GUIDE here: https://githu
 
 **BitPay Support:**
 
+* Last Version Tested: 3.5.x
 * [Github Issues](https://github.com/bitpay/wpmembership-plugin/issues)
   * Open an Issue if you are having issues with this plugin
 * [Support](https://support.bitpay.com/)
