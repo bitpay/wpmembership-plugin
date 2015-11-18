@@ -1,6 +1,9 @@
 # Using the BitPay plugin for WPMU Membership
 
 ## Prerequisites
+
+* Last Version Tested: 3.5.x
+
 You must have a BitPay merchant account to use this plugin.  It's free to [sign-up for a BitPay merchant account](https://bitpay.com/start).
 
 ## Installation
