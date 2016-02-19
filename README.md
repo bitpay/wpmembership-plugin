@@ -23,8 +23,8 @@ To get up and running with our plugin quickly, see the GUIDE here: https://githu
 * Last Version Tested: 3.5.x
 * [Github Issues](https://github.com/bitpay/wpmembership-plugin/issues)
   * Open an Issue if you are having issues with this plugin
-* [Support](https://support.bitpay.com/)
-  * Checkout the BitPay support site
+* [Support](https://help.bitpay.com)
+  * BitPay merchant support documentation
 
 **WPMU Membership Support:**
 
@@ -43,8 +43,6 @@ Some web servers have outdated root CA certificates and will cause this curl err
 The log file is named 'bplog.txt' and can be found in the same directory as the plugin files. Checking this log file will give you exact responses from the BitPay network, in case of failures.
 
 Check the version of this plugin agains the official repository to ensure you are using the latest version. Your issue might have been addressed in a newer version of the plugin: https://github.com/bitpay/wpmembership-plugin
-
-If all else fails, send an email describing your issue *in detail* to support@bitpay.com and attach the bplog.txt file.
 
 ## Contribute
 
